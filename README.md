@@ -5,6 +5,7 @@ Built on the WAT framework below.
 
 ## Project quick start
 ```
+git clone --recurse-submodules git@github.com:HengkiAgung/emergency-positioning-beacon-meshtatic.git
 pip install -r requirements.txt
 python -m pytest tests
 python tools/pso_placement.py --sweep 1-6        # PSO vs baseline, min K for target coverage
@@ -15,9 +16,10 @@ Prototype devices: **Client** (beacon) → **Repeater** (buoy) → **Base** (gat
 |---|---|
 | `workflows/pso_buoy_placement.md` | simulate/optimise buoy positions |
 | `workflows/node_provisioning.md` | flash + configure Heltec V3 / Meshtastic nodes |
+| `workflows/firmware_build_flash.md` | build + flash beacon firmware (MPU6050 capsize SOS): `python tools/firmware_flash.py --port COMx` |
 | `workflows/field_test_analysis.md` | log + analyse RSSI/SNR/delay, calibrate model |
 
-**TODO before real results:** replace PLACEHOLDER `data/*.csv` + gateway coords in `configs/default.json` with QGIS data; calibrate `radio.path_loss_exp` from field tests; decide SOS/tilt firmware approach (`firmware/README.md`).
+**TODO before real results:** replace PLACEHOLDER `data/*.csv` + gateway coords in `configs/default.json` with QGIS data; calibrate `radio.path_loss_exp` from field tests; SOS button firmware (tilt SOS done, `firmware/README.md`).
 
 ---
 

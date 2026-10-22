@@ -4,6 +4,9 @@ numpy>=1.26
 pandas>=2.0
 matplotlib>=3.8
 pytest>=8.0
+# Firmware build/flash (tools/firmware_flash.py):
+platformio>=6.1
+pyserial>=3.5
 # Field logging (needs a Meshtastic node on USB/serial) — optional:
 # meshtastic>=2.3
 # pypubsub>=4.0

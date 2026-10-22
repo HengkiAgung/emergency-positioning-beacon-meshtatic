@@ -28,5 +28,5 @@ Flash and configure the 3 prototype Heltec LoRa32 V3 devices with Meshtastic: Cl
 
 ## Edge Cases & Learnings
 - **Region/frequency**: Heltec "915 MHz" hardware band covers 902–928 MHz; Indonesia permits 920–923 MHz. Meshtastic region enums are fixed lists — verify the right one (and duty-cycle/power limits) rather than assuming. Proposal doc is inconsistent on 915 vs 920–923; resolve in Bab II/III.
-- MPU6050 tilt auto-trigger and SOS button are **not** stock Meshtastic features: need custom firmware module or an external MCU sending a trigger (see `firmware/README.md`).
+- MPU6050 tilt auto-trigger is **not** stock: beacon (Client) runs the fork firmware — flash it with `workflows/firmware_build_flash.md` instead of the web flasher. SOS button still TODO.
 - Meshtastic ROUTER role rebroadcasts everything; for fixed buoys it is the intended role.
