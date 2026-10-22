@@ -33,3 +33,5 @@ Put the beacon firmware (Meshtastic + MPU6050 capsize SOS) on a Heltec V3 and co
 - Update mode writes `boot_app0.bin` at 0xe000 too, so the board boots app0 even if it last ran from OTA slot.
 - Boot log is plain text on USB serial only while no API client (phone app/CLI) is connected.
 - First build ~12 min (toolchain download); later builds incremental.
+- Windows: clone into a short path (e.g. `C:\proj\beacon`). Deep paths hit the 260-char limit in nested submodules (`Filename too long`, `unable to write file .../objects/pack`). `git config --global core.longpaths true` helps for working-tree files but not always for `.git/modules` packs.
+- Fresh `git clone --recurse-submodules` verified 2026-10-22: ~32 MB, fork at `beacon-capsize`, nested `protobufs` + `meshtestic` OK.
