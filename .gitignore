@@ -36,5 +36,3 @@ data/field/*.csv
 # Node config exports contain channel PSKs
 data/field/*.yaml
 
-# Meshtastic firmware fork (clone of upstream tag; our changes live in firmware/patches/)
-firmware/meshtastic-fw/

@@ -14,15 +14,9 @@ Decision (2026-10-22): **custom firmware**, MPU6050 wired directly to Heltec V3 
 
 ## Custom firmware: capsize SOS (MPU6050)
 
-Source: `patches/0001-mpu6050-wire1-fix-and-capsize-sos.patch` on top of `meshtastic/firmware` tag `v2.7.26.54e0d8d` (same as stock on devices). The clone `meshtastic-fw/` is gitignored; recreate it with:
+Source: submodule `meshtastic-fw/` → [HengkiAgung/firmware](https://github.com/HengkiAgung/firmware/tree/beacon-capsize), branch `beacon-capsize`, based on upstream tag `v2.7.26.54e0d8d` (same as stock on devices). Remote `upstream` = meshtastic/firmware.
 
-```
-cd firmware
-git clone --depth 1 --branch v2.7.26.54e0d8d --recurse-submodules --shallow-submodules https://github.com/meshtastic/firmware.git meshtastic-fw
-cd meshtastic-fw && git apply ../patches/0001-mpu6050-wire1-fix-and-capsize-sos.patch
-```
-
-Changed files only:
+Changes vs upstream:
 
 - `src/motion/MPU6050Sensor.h/.cpp`
   - **Bug fix (upstream):** stock `sensor.begin(addr)` always used `Wire`, so MPU6050 on `Wire1` logged `MPU6050 init failed`. Now picks `Wire1` when scanned on port 2.
@@ -30,14 +24,13 @@ Changed files only:
   - Thresholds are `#define CAPSIZE_*` in the header (override via `-D` build flags).
   - Mount MPU6050 with Z axis pointing up when the boat is upright.
 
-Build / flash (PlatformIO, `pip install platformio`):
+## Build & flash
 
 ```
-cd firmware/meshtastic-fw
-python -m platformio run -e heltec-v3
-python -m esptool --chip esp32s3 --port COM7 --baud 921600 write_flash -z \
-  0xe000 ~/.platformio/packages/framework-arduinoespressif32/tools/partitions/boot_app0.bin \
-  0x10000 .pio/build/heltec-v3/firmware-heltec-v3-2.7.26.54e0d8d.bin
+git clone --recurse-submodules git@github.com:HengkiAgung/emergency-positioning-beacon-meshtatic.git
+pip install platformio pyserial meshtastic
+python tools/firmware_flash.py --port COM7            # existing node, keeps config
+python tools/firmware_flash.py --port COM7 --factory  # new board, wipes config
 ```
 
-(`esptool` lives in `~/.platformio/packages/tool-esptoolpy/esptool.py` if not on PATH.) Only otadata + app are written, so node config in LittleFS is kept. `pio run -t nobuild -t upload` fails in this tree (`Import of non-existent variable 'projenv'`). Verify on boot log: `MPU6050 init ok`.
+Full SOP (multi-board, editing the fork, upgrading Meshtastic): `workflows/firmware_build_flash.md`.

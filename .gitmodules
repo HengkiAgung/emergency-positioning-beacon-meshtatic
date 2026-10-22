@@ -1,0 +1,5 @@
+[submodule "firmware/meshtastic-fw"]
+	path = firmware/meshtastic-fw
+	url = https://github.com/HengkiAgung/firmware.git
+	branch = beacon-capsize
+	shallow = true
