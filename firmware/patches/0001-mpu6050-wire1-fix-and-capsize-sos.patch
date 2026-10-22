@@ -1,0 +1,165 @@
+diff --git a/src/motion/MPU6050Sensor.cpp b/src/motion/MPU6050Sensor.cpp
+index 5d4f7bf..31e8e06 100644
+--- a/src/motion/MPU6050Sensor.cpp
++++ b/src/motion/MPU6050Sensor.cpp
+@@ -2,17 +2,31 @@
+ 
+ #if !defined(ARCH_STM32WL) && !MESHTASTIC_EXCLUDE_I2C && __has_include(<Adafruit_MPU6050.h>)
+ 
++#include "MeshService.h"
++#include "NodeDB.h"
++#include "main.h"
++#include "mesh/Router.h"
++#include "modules/PositionModule.h"
++#include <math.h>
++
+ MPU6050Sensor::MPU6050Sensor(ScanI2C::FoundDevice foundDevice) : MotionSensor::MotionSensor(foundDevice) {}
+ 
+ bool MPU6050Sensor::init()
+ {
+-    if (sensor.begin(deviceAddress())) {
++#if defined(WIRE_INTERFACES_COUNT) && (WIRE_INTERFACES_COUNT > 1)
++    TwoWire *bus = (device.address.port == ScanI2C::I2CPort::WIRE1 ? &Wire1 : &Wire);
++#else
++    TwoWire *bus = &Wire;
++#endif
++    if (sensor.begin(deviceAddress(), bus)) {
+         // setup motion detection
+         sensor.setHighPassFilter(MPU6050_HIGHPASS_0_63_HZ);
+         sensor.setMotionDetectionThreshold(1);
+         sensor.setMotionDetectionDuration(20);
+         sensor.setInterruptPinLatch(true); // Keep it latched.  Will turn off when reinitialized.
+         sensor.setInterruptPinPolarity(true);
++        sensor.setAccelerometerRange(MPU6050_RANGE_4_G);
++        sensor.setFilterBandwidth(MPU6050_BAND_10_HZ);
+         LOG_DEBUG("MPU6050 init ok");
+         return true;
+     }
+@@ -25,7 +39,79 @@ int32_t MPU6050Sensor::runOnce()
+     if (sensor.getMotionInterruptStatus()) {
+         wakeScreen();
+     }
++    updateCapsize();
+     return MOTION_SENSOR_CHECK_INTERVAL_MS;
+ }
+ 
+-#endif
+\ No newline at end of file
++void MPU6050Sensor::updateCapsize()
++{
++    sensors_event_t a, g, t;
++    if (!sensor.getEvent(&a, &g, &t))
++        return;
++
++    float ax = a.acceleration.x, ay = a.acceleration.y, az = a.acceleration.z;
++    float mag = sqrtf(ax * ax + ay * ay + az * az);
++    if (mag < 1.0f) // free fall / bad read, no gravity reference
++        return;
++
++    // Angle between sensor Z axis and gravity: 0 = upright, 180 = upside down
++    float tiltDeg = acosf(fmaxf(-1.0f, fminf(1.0f, az / mag))) * 180.0f / (float)M_PI;
++    filteredTiltDeg += 0.2f * (tiltDeg - filteredTiltDeg); // low-pass against wave chop
++
++    uint32_t now = millis();
++
++    if (filteredTiltDeg > CAPSIZE_TILT_TRIGGER_DEG) {
++        uprightSince = 0;
++        if (tiltSince == 0)
++            tiltSince = now;
++        if (!capsized && now - tiltSince >= CAPSIZE_HOLD_MS) {
++            capsized = true;
++            LOG_WARN("Capsize detected, tilt=%.0f deg", filteredTiltDeg);
++            sendSos("CAPSIZE");
++        } else if (capsized && now - lastSosSentMs >= CAPSIZE_REPEAT_MS) {
++            sendSos("CAPSIZE");
++        }
++    } else if (filteredTiltDeg < CAPSIZE_TILT_CLEAR_DEG) {
++        tiltSince = 0;
++        if (capsized) {
++            if (uprightSince == 0)
++                uprightSince = now;
++            if (now - uprightSince >= CAPSIZE_HOLD_MS) {
++                capsized = false;
++                uprightSince = 0;
++                LOG_INFO("Capsize cleared, tilt=%.0f deg", filteredTiltDeg);
++                sendSos("CLEARED");
++            }
++        }
++    }
++}
++
++void MPU6050Sensor::sendSos(const char *reason)
++{
++    lastSosSentMs = millis();
++
++    double lat = 0, lon = 0;
++    meshtastic_NodeInfoLite *self = nodeDB->getMeshNode(nodeDB->getNodeNum());
++    if (self && self->has_position && (self->position.latitude_i || self->position.longitude_i)) {
++        lat = self->position.latitude_i * 1e-7;
++        lon = self->position.longitude_i * 1e-7;
++    }
++
++    meshtastic_MeshPacket *p = router->allocForSending();
++    p->decoded.portnum = meshtastic_PortNum_TEXT_MESSAGE_APP;
++    p->to = NODENUM_BROADCAST;
++    p->channel = 0;
++    p->want_ack = false;
++    p->priority = meshtastic_MeshPacket_Priority_ALERT;
++    int len = snprintf((char *)p->decoded.payload.bytes, sizeof(p->decoded.payload.bytes), "SOS %s %.7f,%.7f tilt=%.0f",
++                       reason, lat, lon, filteredTiltDeg);
++    p->decoded.payload.size = (len > 0 && (size_t)len < sizeof(p->decoded.payload.bytes)) ? len : 0;
++
++    LOG_INFO("Send %.*s", p->decoded.payload.size, p->decoded.payload.bytes);
++    service->sendToMesh(p, RX_SRC_LOCAL, true);
++
++    if (positionModule)
++        positionModule->sendOurPosition();
++}
++
++#endif
+diff --git a/src/motion/MPU6050Sensor.h b/src/motion/MPU6050Sensor.h
+index 2bca72b..91a44c8 100644
+--- a/src/motion/MPU6050Sensor.h
++++ b/src/motion/MPU6050Sensor.h
+@@ -8,11 +8,34 @@
+ 
+ #include <Adafruit_MPU6050.h>
+ 
++// Capsize (beacon) detection: tilt of the Z axis away from vertical
++#ifndef CAPSIZE_TILT_TRIGGER_DEG
++#define CAPSIZE_TILT_TRIGGER_DEG 70.0f // tilt above this counts as capsized
++#endif
++#ifndef CAPSIZE_TILT_CLEAR_DEG
++#define CAPSIZE_TILT_CLEAR_DEG 45.0f // tilt below this counts as upright again (hysteresis)
++#endif
++#ifndef CAPSIZE_HOLD_MS
++#define CAPSIZE_HOLD_MS 5000 // tilt must persist this long, filters out waves
++#endif
++#ifndef CAPSIZE_REPEAT_MS
++#define CAPSIZE_REPEAT_MS 60000 // resend SOS while still capsized
++#endif
++
+ class MPU6050Sensor : public MotionSensor
+ {
+   private:
+     Adafruit_MPU6050 sensor;
+ 
++    float filteredTiltDeg = 0;
++    uint32_t tiltSince = 0;     // millis() when tilt first exceeded trigger, 0 = not tilted
++    uint32_t uprightSince = 0;  // millis() when tilt first fell below clear, 0 = not upright
++    bool capsized = false;
++    uint32_t lastSosSentMs = 0;
++
++    void updateCapsize();
++    void sendSos(const char *reason);
++
+   public:
+     explicit MPU6050Sensor(ScanI2C::FoundDevice foundDevice);
+     virtual bool init() override;
+@@ -21,4 +44,4 @@ class MPU6050Sensor : public MotionSensor
+ 
+ #endif
+ 
+-#endif
+\ No newline at end of file
++#endif
