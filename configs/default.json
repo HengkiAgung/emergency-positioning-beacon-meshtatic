@@ -1,0 +1,32 @@
+{
+  "_note": "PLACEHOLDER scenario. Replace gateway + data/route_waypoints.csv with real QGIS/Google Earth data before using results in the report.",
+  "gateway": {"lat": -1.2650, "lon": 116.8060, "name": "Gateway (placeholder: Semayang port area)"},
+  "route_csv": "data/route_waypoints.csv",
+  "candidates_csv": "data/candidate_sites.csv",
+  "route_spacing_m": 250,
+  "bbox_pad_m": 2000,
+  "max_hops": 3,
+  "conn_penalty": 0.5,
+  "k": 1,
+  "target_coverage": 0.95,
+  "radio": {
+    "freq_mhz": 915.0,
+    "tx_power_dbm": 22.0,
+    "tx_gain_dbi": 3.5,
+    "rx_gain_dbi": 3.5,
+    "sensitivity_dbm": -132.0,
+    "fade_margin_db": 10.0,
+    "path_loss_exp": 3.3,
+    "antenna_height_m": 2.0
+  },
+  "pso": {
+    "particles": 40,
+    "iterations": 150,
+    "w_start": 0.9,
+    "w_end": 0.4,
+    "c1": 1.8,
+    "c2": 1.8,
+    "seed": 0,
+    "snap_to_candidates": false
+  }
+}
