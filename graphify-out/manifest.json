@@ -1,0 +1,112 @@
+{
+  "configs/default.json": {
+    "mtime": 1792673692.1741536,
+    "ast_hash": "22217e161e40db2a626753001e918441",
+    "semantic_hash": "22217e161e40db2a626753001e918441"
+  },
+  "tests/test_core.py": {
+    "mtime": 1792673005.8830135,
+    "ast_hash": "dc13c10a36ae2832d3d2d053cd65b5a8",
+    "semantic_hash": "dc13c10a36ae2832d3d2d053cd65b5a8"
+  },
+  "tools/_shared.py": {
+    "mtime": 1792672685.304888,
+    "ast_hash": "020990f163b9b761bea963f6b45f778c",
+    "semantic_hash": "020990f163b9b761bea963f6b45f778c"
+  },
+  "tools/analyze_field_test.py": {
+    "mtime": 1792673007.1398978,
+    "ast_hash": "38f2b9da7866c02c97cd66154796ba90",
+    "semantic_hash": "38f2b9da7866c02c97cd66154796ba90"
+  },
+  "tools/geo.py": {
+    "mtime": 1792672911.2159476,
+    "ast_hash": "1ab51eedf8d7a39de58f6c4e39f953d0",
+    "semantic_hash": "1ab51eedf8d7a39de58f6c4e39f953d0"
+  },
+  "tools/knowledge.py": {
+    "mtime": 1792672685.304888,
+    "ast_hash": "1bbf1f6d610de37c2ff0418b15ea7696",
+    "semantic_hash": "1bbf1f6d610de37c2ff0418b15ea7696"
+  },
+  "tools/lora_model.py": {
+    "mtime": 1792672975.9993317,
+    "ast_hash": "6fad12e3887b344936d512cdc5fe0149",
+    "semantic_hash": "6fad12e3887b344936d512cdc5fe0149"
+  },
+  "tools/meshtastic_logger.py": {
+    "mtime": 1792673006.0955126,
+    "ast_hash": "6372a4f6cabaefac1b3ebb29a1e7e9fb",
+    "semantic_hash": "6372a4f6cabaefac1b3ebb29a1e7e9fb"
+  },
+  "tools/pso_placement.py": {
+    "mtime": 1792672948.2847376,
+    "ast_hash": "aac38fc05ab0591a68431098c0bfec7f",
+    "semantic_hash": "aac38fc05ab0591a68431098c0bfec7f"
+  },
+  "CLAUDE.md": {
+    "mtime": 1792672685.3027217,
+    "ast_hash": "35927c1732b0a97a3f870836540f2f38",
+    "semantic_hash": "35927c1732b0a97a3f870836540f2f38"
+  },
+  "README.md": {
+    "mtime": 1792673692.1751523,
+    "ast_hash": "0f0d07014d0b2132e213596d66ac63c6",
+    "semantic_hash": "0f0d07014d0b2132e213596d66ac63c6"
+  },
+  "docs/Draft Proposal Emergency Positioning Beacon.txt": {
+    "mtime": 1792672468.8925416,
+    "ast_hash": "eca182eb7664819fa8696c888cecd0dd",
+    "semantic_hash": "eca182eb7664819fa8696c888cecd0dd"
+  },
+  "firmware/README.md": {
+    "mtime": 1792673041.921506,
+    "ast_hash": "a0062ee845b369e022bde74494099b6b",
+    "semantic_hash": "a0062ee845b369e022bde74494099b6b"
+  },
+  "knowledge/README.md": {
+    "mtime": 1792672685.3027217,
+    "ast_hash": "6cc39323e894fa8a670d0b94630a76bb",
+    "semantic_hash": "6cc39323e894fa8a670d0b94630a76bb"
+  },
+  "knowledge/notes/project-scope-and-open-decisions.md": {
+    "mtime": 1792673692.2769175,
+    "ast_hash": "19fdc36a1f4f2c22f6cc79c211a24367",
+    "semantic_hash": "19fdc36a1f4f2c22f6cc79c211a24367"
+  },
+  "knowledge/notes/pso-model-design.md": {
+    "mtime": 1792673188.091122,
+    "ast_hash": "1cd35b980936b6f7850f2a19a5cf8dcf",
+    "semantic_hash": "1cd35b980936b6f7850f2a19a5cf8dcf"
+  },
+  "requirements.txt": {
+    "mtime": 1792673005.9216938,
+    "ast_hash": "59bbf771383bdc5f011c1e2bdbe8edd1",
+    "semantic_hash": "59bbf771383bdc5f011c1e2bdbe8edd1"
+  },
+  "workflows/_template.md": {
+    "mtime": 1792672685.304888,
+    "ast_hash": "233ce8f2d562f59f7e15e2cf14a04ce1",
+    "semantic_hash": "233ce8f2d562f59f7e15e2cf14a04ce1"
+  },
+  "workflows/field_test_analysis.md": {
+    "mtime": 1792673040.8823855,
+    "ast_hash": "17b5ed1bca3728f17faeb58716a38646",
+    "semantic_hash": "17b5ed1bca3728f17faeb58716a38646"
+  },
+  "workflows/knowledge_base.md": {
+    "mtime": 1792672685.304888,
+    "ast_hash": "2175a7580c9a8bc0cce1751b629bd3cd",
+    "semantic_hash": "2175a7580c9a8bc0cce1751b629bd3cd"
+  },
+  "workflows/node_provisioning.md": {
+    "mtime": 1792673692.1751523,
+    "ast_hash": "aa70676e23155ae0485771a1c04f2d97",
+    "semantic_hash": "aa70676e23155ae0485771a1c04f2d97"
+  },
+  "workflows/pso_buoy_placement.md": {
+    "mtime": 1792673692.1751523,
+    "ast_hash": "fde69b21625f93cc0f46cc23bcc84443",
+    "semantic_hash": "fde69b21625f93cc0f46cc23bcc84443"
+  }
+}
